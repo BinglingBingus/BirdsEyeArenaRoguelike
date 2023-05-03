@@ -9,46 +9,75 @@ public class PlayerController : MonoBehaviour
     [SerializeField]public GameObject   Bullet;
     [SerializeField]public GameObject   BulletSpawnPoint;
     [SerializeField]public LayerMask    groundmask;
-                    public float AttackSpeed;
+    [SerializeField]public Transform    PlayerTransform;
+                    public float        AttackSpeed;
+                    public float        AttackCooldown;
+                    Transform           SpawnedBulletPos;
+                    Vector3             FacingDirectionRotation;
+                    public bool         isfiring = false;
                     //public Vector3      BulletSpawn;
                     
 
-    // Start is called before the first frame update
+    // Start is called before the first frame updat
+    // Update is called once per frame
+
     void Start()
     {
         
     }
-
-    // Update is called once per frame
     void FixedUpdate()
     {
-        StartCoroutine("PlayerControllerAttack");
+        
+        PlayerControllerMovement();
+        PlayerControllerAttack();
+            
+        
+        AttackCooldown -= Time.deltaTime;
+        
     }
 
     void PlayerControllerMovement()
     {
-        
-    }
-        IEnumerator PlayerControllerAttack()
-    {
-       // BulletSpawn = new Vector3 
-        if(Input.GetMouseButtonDown(0))
+        if(Physics.Raycast(PlayerCamera.ScreenPointToRay(Input.mousePosition),out RaycastHit FacingDirection, float.MaxValue, groundmask))
         {
-            
+            FacingDirectionRotation = FacingDirection.point;
+            FacingDirectionRotation.y += 0.5f;
+            //FacingDirectionRotation.x = 0
+            //FacingDirectionRotation.z = ;
+
+            PlayerTransform.LookAt(FacingDirectionRotation);
+
+        }
+    }
+
+        void PlayerControllerAttack()
+        {
+            if(Input.GetMouseButton(0) && AttackCooldown <=0)
+            {
             Instantiate(Bullet,BulletSpawnPoint.transform.position,Quaternion.identity);
-            yield return new WaitForSeconds (AttackSpeed);
+            AttackCooldown = 1f/AttackSpeed;
+            
+            Debug.Log("Firing");
+            }
+
         }
 
-    }
-        public void BulletLogicSystem()
-    {
-        //Bullet.transform.position = 
-        if(Physics.Raycast(PlayerCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitlocation,float.MaxValue,groundmask))
-        {
-            GameObject.FindWithTag("ProjectilePlayer").GetComponent<Transform>().position = hitlocation.point;
-        }
-        
+   //     IEnumerator PlayerControllerAttack()
+    //{
+      //  if(Input.GetMouseButtonDown(0))
+       // {
+            
 
-        
-    }
+         //   Instantiate(Bullet,BulletSpawnPoint.transform.position,Quaternion.identity);
+          //  yield return new WaitForSeconds (AttackSpeed);
+            //Loop
+       // }
+
+    //}
+    
 }
+        
+
+        
+    
+
